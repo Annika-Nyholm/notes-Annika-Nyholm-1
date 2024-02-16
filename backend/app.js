@@ -5,6 +5,7 @@ const logger = require('morgan');
 const cors = require('cors');
 const connection = require('./lib/conn');
 require('dotenv').config();
+const mysql = require('mysql2');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
