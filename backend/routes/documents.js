@@ -20,7 +20,7 @@ router.get('/', function (req, res) {
             return;
         }
         //här ska vi hitta att checka och skicka mess om table är tomt för usern
-        if (data === null) {
+        if (data.length === 0) {
             res.status(204).json({ message: 'No content found' });
         } else {
             res.json(data);
