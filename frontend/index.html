@@ -5,16 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quick Notes</title>
     <link rel="stylesheet" href="style.css">
-    <script src="sript.js" defer></script>
+    <script src="script.js" type="module"></script>
 </head>
 <body>
     <header>
         <h1>Quick Notes</h1>
         <nav>
-            <div class="login" id="login">
-                <input type="email" name="" id="" placeholder="email">
-                <input type="password" placeholder="password">
+            <div class="login" id="loginDiv">
+                <input type="email" name="email" id="emailInput" placeholder="email">
+                <input type="password" name="password" id="passwordInput" placeholder="password">
                 <button id="loginButton">Login</button>
+            </div>
+            <div id="logoutDiv" class="hidden">
+                <button id="logoutButton">Logout</button>
             </div>
             <div>
                 <button class="home" id="home">Home</button>
