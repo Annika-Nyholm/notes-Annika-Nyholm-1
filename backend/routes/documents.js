@@ -65,7 +65,7 @@ router.post('/add', (req, res) => {
 
     connection.query(query, values, (err, data) => {
         if (err) {
-            console.error('Error creating documents', err);
+            console.error('Error creating document', err);
             res.status(500).json({ message: 'Internal server error', error: err });
             return;
         }
