@@ -23,8 +23,25 @@ router.get('/', function (req, res) {
         if (data.length === 0) {
             res.status(204).json({ message: 'No content found' });
         } else {
-            res.json(data);
+            res.json({ documents: data });
         }
+    });
+});
+
+//hämta ett specifikt dokument
+router.get('/:id', (req, res) => {
+    const docId = req.params.id;
+
+    let query = 'SELECT * FROM documents WHERE id = ?';
+    let value = [docId];
+
+    connection.query(query, value, (err, data) => {
+        if (err) {
+            console.error('Error fetching document', err);
+            res.status(500).json({ message: 'Internal server error' });
+            return;
+        }
+        res.json({ document: data })
     });
 });
 
@@ -87,7 +104,7 @@ router.delete('/:id', (req, res) => {
             res.status(500).json({ message: 'Internal server error', error: err });
             return;
         }
-        res.json({message: 'Delete complete', deletedDoc: data[0].id});
+        res.json({ message: 'Delete complete', deletedDoc: data[0].id });
     });
 });
 
