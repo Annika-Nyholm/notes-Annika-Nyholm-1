@@ -86,7 +86,7 @@ router.put('/', (req, res) => {
             res.status(500).json({ message: 'Internal server error', error: err });
             return;
         }
-        res.json({ message: 'Edit complete', editedDoc: data[0].id });
+        res.json({ message: 'Edit complete', editedDoc: id });
 
     });
 });
@@ -104,7 +104,7 @@ router.delete('/:id', (req, res) => {
             res.status(500).json({ message: 'Internal server error', error: err });
             return;
         }
-        res.json({ message: 'Delete complete', deletedDoc: data[0].id });
+        res.json({ message: 'Delete complete', deletedDoc: docId });
     });
 });
 
