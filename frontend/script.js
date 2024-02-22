@@ -1,14 +1,19 @@
-tinymce.init({
-    selector: '#editArea',
-    plugins: 'code',
-    toolbar: 'undo redo | forecolor backcolor | styleselect bold italic underline | alignleft aligncenter alignright | code',
 
-    setup: function(editor) {
-        editor.on('change', function() {
-            editor.save();
-        })
-    }
-});
+function initTinymce() {
+    tinymce.init({
+        selector: '#editArea',
+        plugins: 'code',
+        statusbar: false,
+        menubar: false,
+        toolbar: 'undo redo | forecolor backcolor | styleselect bold italic underline | alignleft aligncenter alignright | code',
+    
+        setup: function(editor) {
+            editor.on('change', function() {
+                editor.save();
+            })
+        }
+    });
+}
 
 import {storeUser, getUser, logoutUser} from "./modules/user.js";
 
@@ -74,8 +79,8 @@ async function printDocList() {
         const user = await getUser();
         const response = await fetch(`http://localhost:3000/documents/?userId=${user.id}`)
         const data = await response.json();
-
-        //console.log('detta är printdatan:', data.documents);
+        console.log('detta är datan: ', data.documents);
+        
         documentList.innerHTML = '';
         data.documents.map(doc => {
             let li = document.createElement('li')
@@ -86,20 +91,39 @@ async function printDocList() {
                 console.log('du klickar på: ', doc.id);
                 //funktion för att öppna doc i läsläge
                 printReadDoc(doc);
-            })
-
+            });
+            let button = document.createElement('button');
+            button.innerText = 'delete';
+            button.addEventListener('click', () => {
+                console.log('du klickar på: ', doc.id);
+                //delete doc funktion (doc.id)?
+                deleteDocument(doc.id);
+                printDocList();
+            });
+            documentList.appendChild(button);
             documentList.appendChild(li);
-        })
-
-
+        });
 
     } catch (error) {
         console.error('Error fetching list', error);
-        response.status(500).json({message: 'Internal server error', error: error});
+        documentList.innerHTML = '<li>No documents available</li>';
     }
-
-
 }
+
+//funktion för att delete dokument
+function deleteDocument(docId) {
+    fetch(`http://localhost:3000/documents/${docId}`, {
+        method: 'DELETE',
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log('raderad', data);
+        
+    })
+    .catch(error => {
+        console.error('Error deleting document', error);
+    });
+};
 
 
 //funktion för att visa i read-mode
@@ -123,13 +147,14 @@ function printReadDoc(doc) {
     const content = document.createElement('div');
     content.classList.add('read_document');
     content.id = 'readDocumentContent';
-    content.innerText = doc.content;
+    content.innerHTML = doc.content;
 
     const editButton = document.createElement('button');
     editButton.id = 'editButton';
     editButton.innerText = 'Edit';
     editButton.addEventListener('click', () => {
         console.log('clicketiclack');
+        printEditDoc(doc);
     })
 
     const closeButton = document.createElement('button');
@@ -153,7 +178,79 @@ function printReadDoc(doc) {
 }
 
 //funktion för att visa i edit-mode
+
+function printEditDoc(doc) {
+
+    const article = document.createElement('article');
+    article.classList.add('edit_document');
+    article.id = 'editDocument';
+
+    const input = document.createElement('input');
+    input.id = 'documentHeading';
+    input.name = 'documentHeading';
+    input.type = 'text';
+    input.placeholder = 'Document title';
+    input.value = doc.heading;
+    input.addEventListener('input', () => {
+        console.log('Document title: ', input.value);
+    });
+
+    const textarea = document.createElement('textarea');
+    textarea.id = 'editArea';
+    textarea.name = 'editArea';
+    textarea.cols = '60';
+    textarea.rows = '30';
+    textarea.value = doc.content;
+    
+    const button = document.createElement('button');
+    button.id = 'saveEditButton';
+    button.innerText = 'Save edit';
+    button.addEventListener('click', () => {
+        console.log('On click save this to DB: ', input.value, textarea.value);
+        const editedContent = textarea.value;
+        const editedHeading = input.value;
+        const docId = doc.id;
+        
+        //uppdatera heading i db och content och lastEdited
+        saveEditToDB(editedContent, editedHeading, docId);
+        printDocList();
+
+        const editedDoc = { id: docId, heading: editedHeading, content: editedContent };
+        printReadDoc(editedDoc);
+    });
+
+    article.appendChild(input);
+    article.appendChild(textarea);
+    article.appendChild(button);
+
+    documentContainer.innerHTML = ''; 
+    documentContainer.appendChild(article);
+    initTinymce();
+}
+
 //spara editerat dokument i databas
+
+function saveEditToDB(editedContent, editedHeading, docId) {
+    fetch('http://localhost:3000/documents', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({content: editedContent, heading: editedHeading, id: docId})
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        console.log('Edit saved successfully: ', data);
+        
+    })
+    .catch(error => {
+        console.error('Error saving edit:', error);
+    });
+
+    tinymce.remove();
+}
 //Skapa nytt dokument, 2 fields ett för heading ett för content
 //spara dokument i databas
 
