@@ -24,8 +24,10 @@ let logoutDiv = document.getElementById('logoutDiv');
 let documentList = document.getElementById('documentList');
 let documentContainer = document.getElementById('documentContainer');
 let buttonHolder = document.getElementById('buttonHolder');
+let newUserDiv = document.getElementById('newUserDiv');
 
 function init() {
+    createNewUserButton();
     //Is user logged in?
     if (getUser() !== null) {
         toggleHiddenClass();
@@ -84,8 +86,70 @@ function createNewUserButton() {
     button.innerText = 'New user';
     button.id = 'newUserButton';
     button.addEventListener('click', () => {
-        //Skapa ny användare
+        console.log('klicketi-kuu');
+        //Skapa ny användarformulär
+        createNewUserForm();
+        loginDiv.classList.add('hidden');
+
     })
+    loginDiv.appendChild(button);
+}
+
+//Skapa ny användar-formulär
+function createNewUserForm() {
+    let inputName = document.createElement('input');
+    inputName.type = 'text';
+    inputName.name = 'name';
+    inputName.placeholder = 'First and Last name';
+
+    let inputEmail = document.createElement('input');
+    inputEmail.type = "email";
+    inputEmail.name = "email";
+    inputEmail.id = "emailInput";
+    inputEmail.placeholder = "email";
+
+    let inputPassword = document.createElement('input');
+    inputPassword.type = "password";
+    inputPassword.name = "password";
+    inputPassword.id = "passwordInput";
+    inputPassword.placeholder = "password";
+
+    let button = document.createElement('button');
+    button.innerText = 'Save';
+    button.addEventListener('click', () => {
+        console.log('kackelikack');
+        const name = inputName.value;
+        const email = inputEmail.value;
+        const password = inputPassword.value;
+        //spara new user från input till databasen
+        saveNewUser(name, email, password);
+    })
+
+    newUserDiv.appendChild(inputName);
+    newUserDiv.appendChild(inputEmail);
+    newUserDiv.appendChild(inputPassword);
+    newUserDiv.appendChild(button);
+}
+
+//skapa new user
+function saveNewUser(name, email, password) {
+
+    fetch('http://localhost:3000/users/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: name, email: email, password: password })
+    })
+        .then(res => res.json())
+        .then(data => {
+            console.log(data);
+            storeUser(data);
+            newUserDiv.innerHTML = '';
+        })
+        .catch(error => {
+            console.error('error', error);
+        });
 }
 
 //skapa knapp för skapa dokument
@@ -147,28 +211,28 @@ function createNewDocument() {
 
 };
 
-function  saveNewDocToDB(content, heading) {
+function saveNewDocToDB(content, heading) {
     const userId = getUser().id;
-     
+
     fetch('http://localhost:3000/documents/add', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({id: userId, heading: heading, content: content})
+        body: JSON.stringify({ id: userId, heading: heading, content: content })
 
     })
-    .then(response => {
-        return response.json();
-    })
-    .then(data => {
-        console.log('Edit saved successfully: ', data);
-        tinymce.remove();
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            console.log('Edit saved successfully: ', data);
+            tinymce.remove();
 
-    })
-    .catch(error => {
-        console.error('Error saving edit:', error);
-    });
+        })
+        .catch(error => {
+            console.error('Error saving edit:', error);
+        });
 
 
 }
@@ -182,27 +246,33 @@ async function printDocList() {
         console.log('detta är datan: ', data.documents);
 
         documentList.innerHTML = '';
-        data.documents.map(doc => {
-            let li = document.createElement('li')
-            li.innerText = doc.heading;
 
-            li.addEventListener('click', () => {
+        if (data.documents.length === 0) {
+            documentList.innerHTML = '<li>No documents available</li>';
+        } else {
+            data.documents.map(doc => {
+                let li = document.createElement('li')
+                li.innerText = doc.heading;
 
-                console.log('du klickar på: ', doc.id);
-                //funktion för att öppna doc i läsläge
-                printReadDoc(doc);
+                li.addEventListener('click', () => {
+
+                    console.log('du klickar på: ', doc.id);
+                    //funktion för att öppna doc i läsläge
+                    printReadDoc(doc);
+                });
+                let button = document.createElement('button');
+                button.innerText = 'delete';
+                button.addEventListener('click', () => {
+                    console.log('du klickar på: ', doc.id);
+                    //delete doc funktion (doc.id)?
+                    deleteDocument(doc.id);
+                    printDocList();
+                });
+                documentList.appendChild(button);
+                documentList.appendChild(li);
             });
-            let button = document.createElement('button');
-            button.innerText = 'delete';
-            button.addEventListener('click', () => {
-                console.log('du klickar på: ', doc.id);
-                //delete doc funktion (doc.id)?
-                deleteDocument(doc.id);
-                printDocList();
-            });
-            documentList.appendChild(button);
-            documentList.appendChild(li);
-        });
+
+        }
 
     } catch (error) {
         console.error('Error fetching list', error);
