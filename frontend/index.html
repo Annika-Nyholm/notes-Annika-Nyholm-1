@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quick Notes</title>
     <link rel="stylesheet" href="style.css">
+    <script type="module" src="node_modules/tinymce/tinymce.min.js"></script>
     <script src="script.js" type="module"></script>
 </head>
 <body>
@@ -27,28 +28,29 @@
     </header>
     <main>
 
-        <section class="documents_container">
-            <article class="read_document_container">
-                <h3>Document1</h3>
-                <div class="read_document" id="readDocument">
-                    Här kan man inte ändra något. Man kan bara läsa!
+        <section class="documents_container" id="documentContainer">
+            <!--<article class="read_document_container">
+                <h3 id="readDocumentHeading">Document1</h3>
+                <p id="readCreated"></p>
+                <p id="readLastEdited"></p>
+                <div class="read_document" id="readDocumentContent">
+                    
                 </div>
-            </article>
+            </article>-->
             <article class="edit_document" id="editDocument">
-                <h3>Document1</h3>
-                <textarea name="" id="" cols="60" rows="30"></textarea>
-                <button>Save</button>
+                <input type="text" name="documentHeading" id="documentHeading" placeholder=" Document title">
+                <button id="saveTitle">Save title</button>
+                <textarea name="editArea" id="editArea" cols="60" rows="30"></textarea>
+                <button id="saveButton">Save</button>
             </article>
         </section>
-
-        <button>Edit</button>
-        <button>Close</button>
-
+        <!--
+        <button id="editButton">Edit</button>
+        <button id="closeButton">Close</button>
+        -->
         <aside class="document_container">
             <ul class="document_list" id="documentList">
-                <li>Dokument1</li>
-                <li>Dokument2</li>
-                <li>Dokument3</li>
+                
 
             </ul>
         </aside>
