@@ -6,16 +6,16 @@ function initTinymce() {
         statusbar: false,
         menubar: false,
         toolbar: 'undo redo | forecolor backcolor | styleselect bold italic underline | alignleft aligncenter alignright | code',
-    
-        setup: function(editor) {
-            editor.on('change', function() {
+
+        setup: function (editor) {
+            editor.on('change', function () {
                 editor.save();
             })
         }
     });
 }
 
-import {storeUser, getUser, logoutUser} from "./modules/user.js";
+import { storeUser, getUser, logoutUser } from "./modules/user.js";
 
 
 let loginButton = document.getElementById('loginButton');
@@ -23,13 +23,15 @@ let loginDiv = document.getElementById('loginDiv');
 let logoutDiv = document.getElementById('logoutDiv');
 let documentList = document.getElementById('documentList');
 let documentContainer = document.getElementById('documentContainer');
+let buttonHolder = document.getElementById('buttonHolder');
 
 function init() {
     //Is user logged in?
-    if (getUser() !== null ) {
+    if (getUser() !== null) {
         toggleHiddenClass();
         printDocList();
-    } 
+        createDocButton();
+    }
 }
 
 function toggleHiddenClass() {
@@ -49,22 +51,23 @@ loginButton.addEventListener('click', () => {
         },
         body: JSON.stringify({ email: email, password: password })
     })
-    .then(res => res.json())
-    .then(async (data) => {
-        console.log('detta är data', data);
-        //lägga in user i localstorage
-        storeUser(data);
-        //rensa inputfälten
-        
-        document.getElementById('emailInput').value = '';
-        document.getElementById('passwordInput').value = '';
-        
-        //dölja loginfälten
-        toggleHiddenClass();
-        //printa userns dokument i en lista
-        await printDocList();
+        .then(res => res.json())
+        .then(async (data) => {
+            console.log('detta är data', data);
+            //lägga in user i localstorage
+            storeUser(data);
+            //rensa inputfälten
 
-    })
+            document.getElementById('emailInput').value = '';
+            document.getElementById('passwordInput').value = '';
+
+            //dölja loginfälten
+            toggleHiddenClass();
+            //printa userns dokument i en lista
+            await printDocList();
+            createDocButton();
+
+        })
 });
 
 logoutButton.addEventListener('click', () => {
@@ -72,7 +75,104 @@ logoutButton.addEventListener('click', () => {
     loginDiv.classList.remove('hidden');
     logoutDiv.classList.add('hidden');
     documentList.innerHTML = '';
+    buttonHolder.innerHTML = '';
 });
+
+//Skapa knapp för new user
+function createNewUserButton() {
+    let button = document.createElement('button');
+    button.innerText = 'New user';
+    button.id = 'newUserButton';
+    button.addEventListener('click', () => {
+        //Skapa ny användare
+    })
+}
+
+//skapa knapp för skapa dokument
+function createDocButton() {
+    let button = document.createElement('button');
+    button.innerText = 'Create document';
+    button.id = 'createDocument';
+    button.addEventListener('click', () => {
+        console.log('kliiiiiick');
+        createNewDocument();
+    })
+    buttonHolder.appendChild(button);
+}
+
+//Skapa nytt dokument
+function createNewDocument() {
+
+    const article = document.createElement('article');
+    article.classList.add('edit_document');
+    article.id = 'editDocument';
+
+    const input = document.createElement('input');
+    input.id = 'documentHeading';
+    input.name = 'documentHeading';
+    input.type = 'text';
+    input.placeholder = 'Enter document title';
+
+    const textarea = document.createElement('textarea');
+    textarea.id = 'editArea';
+    textarea.name = 'editArea';
+    textarea.cols = '60';
+    textarea.rows = '30';
+    textarea.placeholder = 'Enter document content';
+
+    const button = document.createElement('button');
+    button.id = 'saveEditButton';
+    button.innerText = 'Save';
+    button.addEventListener('click', () => {
+        console.log('On click save this to DB: ', input.value, textarea.value);
+        const content = textarea.value;
+        const heading = input.value;
+
+        // Skicka det nya dokumentet till servern för lagring
+        saveNewDocToDB(content, heading);
+
+        // Uppdatera dokumentlistan för att reflektera det nya dokumentet
+        printDocList();
+        const newDoc = { heading: heading, content: content };
+        printReadDoc(newDoc);
+    });
+
+    article.appendChild(input);
+    article.appendChild(textarea);
+    article.appendChild(button);
+
+    documentContainer.innerHTML = '';
+    documentContainer.appendChild(article);
+    initTinymce();
+
+};
+
+function  saveNewDocToDB(content, heading) {
+    const userId = getUser().id;
+     
+    fetch('http://localhost:3000/documents/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({id: userId, heading: heading, content: content})
+
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        console.log('Edit saved successfully: ', data);
+        tinymce.remove();
+
+    })
+    .catch(error => {
+        console.error('Error saving edit:', error);
+    });
+
+
+}
+
 
 async function printDocList() {
     try {
@@ -80,7 +180,7 @@ async function printDocList() {
         const response = await fetch(`http://localhost:3000/documents/?userId=${user.id}`)
         const data = await response.json();
         console.log('detta är datan: ', data.documents);
-        
+
         documentList.innerHTML = '';
         data.documents.map(doc => {
             let li = document.createElement('li')
@@ -115,20 +215,20 @@ function deleteDocument(docId) {
     fetch(`http://localhost:3000/documents/${docId}`, {
         method: 'DELETE',
     })
-    .then(res => res.json())
-    .then(data => {
-        console.log('raderad', data);
-        
-    })
-    .catch(error => {
-        console.error('Error deleting document', error);
-    });
+        .then(res => res.json())
+        .then(data => {
+            console.log('raderad', data);
+
+        })
+        .catch(error => {
+            console.error('Error deleting document', error);
+        });
 };
 
 
 //funktion för att visa i read-mode
 function printReadDoc(doc) {
-   
+
     const article = document.createElement('article');
     article.classList.add('read_document_container');
 
@@ -161,7 +261,7 @@ function printReadDoc(doc) {
     closeButton.id = 'closeButton';
     closeButton.innerText = 'Close';
     closeButton.addEventListener('click', () => {
-        documentContainer.innerHTML = ''; 
+        documentContainer.innerHTML = '';
     })
 
 
@@ -173,7 +273,7 @@ function printReadDoc(doc) {
     article.appendChild(editButton);
     article.appendChild(closeButton);
 
-    documentContainer.innerHTML = ''; 
+    documentContainer.innerHTML = '';
     documentContainer.appendChild(article);
 }
 
@@ -201,7 +301,7 @@ function printEditDoc(doc) {
     textarea.cols = '60';
     textarea.rows = '30';
     textarea.value = doc.content;
-    
+
     const button = document.createElement('button');
     button.id = 'saveEditButton';
     button.innerText = 'Save edit';
@@ -210,7 +310,7 @@ function printEditDoc(doc) {
         const editedContent = textarea.value;
         const editedHeading = input.value;
         const docId = doc.id;
-        
+
         //uppdatera heading i db och content och lastEdited
         saveEditToDB(editedContent, editedHeading, docId);
         printDocList();
@@ -223,7 +323,7 @@ function printEditDoc(doc) {
     article.appendChild(textarea);
     article.appendChild(button);
 
-    documentContainer.innerHTML = ''; 
+    documentContainer.innerHTML = '';
     documentContainer.appendChild(article);
     initTinymce();
 }
@@ -236,18 +336,18 @@ function saveEditToDB(editedContent, editedHeading, docId) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({content: editedContent, heading: editedHeading, id: docId})
+        body: JSON.stringify({ content: editedContent, heading: editedHeading, id: docId })
     })
-    .then(response => {
-        return response.json();
-    })
-    .then(data => {
-        console.log('Edit saved successfully: ', data);
-        
-    })
-    .catch(error => {
-        console.error('Error saving edit:', error);
-    });
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            console.log('Edit saved successfully: ', data);
+
+        })
+        .catch(error => {
+            console.error('Error saving edit:', error);
+        });
 
     tinymce.remove();
 }
