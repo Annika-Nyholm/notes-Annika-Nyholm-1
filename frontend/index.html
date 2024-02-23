@@ -4,59 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quick Notes</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Protest+Revolution&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="src/sass/style.css" type="text/css">
     
 </head>
 <body>
     <header>
-        <h1>Quick Notes</h1>
-        <nav>
-            <div class="login" id="loginDiv">
-                <input type="email" name="email" id="emailInput" placeholder="email">
-                <input type="password" name="password" id="passwordInput" placeholder="password">
-                <button id="loginButton">Login</button>
-            </div>
-            <div class="new_user" id="newUserDiv">
+        <div class="logout hidden" id="logoutDiv">
+            <!-- <button id="logoutButton">Logout</button> -->
+        </div>
+        <h1>Quick&nbsp;Notes</h1>
+        <div class="button_holder" id="buttonHolder">
+        </div>
 
-            </div>
-            <div id="logoutDiv" class="hidden">
-                <button id="logoutButton">Logout</button>
-            </div>
-            <div id="buttonHolder">
-                <!-- <button class="home" id="home">Home</button>
-                <button class="documents" id="documents">Documents</button> -->
-            </div>
-        </nav>
+        <ul class="document_list" id="documentList">
+        </ul>
     </header>
     <main>
+        <div>
+            <div class="login" id="loginDiv">
+                <!-- <input type="email" name="email" id="emailInput" placeholder="email">
+                <input type="password" name="password" id="passwordInput" placeholder="password">
+                <button id="loginButton">Login</button> -->
+            </div>
 
-        <section class="documents_container" id="documentContainer">
-            <!--<article class="read_document_container">
-                <h3 id="readDocumentHeading">Document1</h3>
-                <p id="readCreated"></p>
-                <p id="readLastEdited"></p>
-                <div class="read_document" id="readDocumentContent">
-                    
-                </div>
-            </article>-->
-            <!--<article class="edit_document" id="editDocument">
-                <input type="text" name="documentHeading" id="documentHeading" placeholder=" Document title">
-                <button id="saveTitle">Save title</button>
-                <textarea name="editArea" id="editArea" cols="60" rows="30"></textarea>
-                <button id="saveButton">Save</button>
-            </article>-->
-        </section>
-        <!--
-        <button id="editButton">Edit</button>
-        <button id="closeButton">Close</button>
-        -->
-        <aside class="document_container">
-            <ul class="document_list" id="documentList">
-                
-
-            </ul>
-        </aside>
-
+            <div class="new_user hidden" id="newUserDiv">
+            </div>
+            <section class="documents_container hidden" id="documentContainer">
+                <!--<article class="read_document_container">
+                    <h3 id="readDocumentHeading">Document1</h3>
+                    <p id="readCreated"></p>
+                    <p id="readLastEdited"></p>
+                    <div class="read_document" id="readDocumentContent">
+                        
+                    </div>
+                </article>-->
+                <!--<article class="edit_document" id="editDocument">
+                    <input type="text" name="documentHeading" id="documentHeading" placeholder=" Document title">
+                    <button id="saveTitle">Save title</button>
+                    <textarea name="editArea" id="editArea" cols="60" rows="30"></textarea>
+                    <button id="saveButton">Save</button>
+                </article>-->
+            </section>
+            <!--
+            <button id="editButton">Edit</button>
+            <button id="closeButton">Close</button>
+            -->
+        </div>
+            
     </main>
     <script type="module" src="node_modules/tinymce/tinymce.min.js"></script>
     <script src="script.js" type="module"></script>
