@@ -18,7 +18,7 @@ function initTinymce() {
 import { storeUser, getUser, logoutUser } from "./modules/user.js";
 
 
-let loginButton = document.getElementById('loginButton');
+//let loginButton = document.getElementById('loginButton');
 let loginDiv = document.getElementById('loginDiv');
 let logoutDiv = document.getElementById('logoutDiv');
 let documentList = document.getElementById('documentList');
@@ -27,76 +27,124 @@ let buttonHolder = document.getElementById('buttonHolder');
 let newUserDiv = document.getElementById('newUserDiv');
 
 function init() {
-    createNewUserButton();
+    printLogin();
     //Is user logged in?
     if (getUser() !== null) {
-        toggleHiddenClass();
         printDocList();
         createDocButton();
+        printLogout();
+        loginDiv.innerHTML = '';
+        loginDiv.classList.add('hidden');
     }
 }
 
-function toggleHiddenClass() {
-    loginDiv.classList.add('hidden');
-    logoutDiv.classList.remove('hidden');
-}
 
-loginButton.addEventListener('click', () => {
-    console.log('clicketiclick');
-    let email = document.getElementById('emailInput').value;
-    let password = document.getElementById('passwordInput').value;
+function printLogin() {
+    loginDiv.innerHTML = '';
+    loginDiv.classList.remove('hidden');
 
-    fetch('http://localhost:3000/users/login', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email: email, password: password })
-    })
-        .then(res => res.json())
-        .then(async (data) => {
-            console.log('detta är data', data);
-            //lägga in user i localstorage
-            storeUser(data);
-            //rensa inputfälten
+    let inputEmail = document.createElement('input');
+    inputEmail.type = "email";
+    inputEmail.name = "email";
+    inputEmail.id = "emailInput";
+    inputEmail.placeholder = "email";
 
+    let inputPassword = document.createElement('input');
+    inputPassword.type = "password";
+    inputPassword.name = "password";
+    inputPassword.id = "passwordInput";
+    inputPassword.placeholder = "password";
+
+    let loginButton = document.createElement('button');
+    loginButton.id = 'loginButton';
+    loginButton.innerText = 'Login';
+    loginButton.addEventListener('click', () => {
+        console.log('clicketiclick');
+
+        let email = document.getElementById('emailInput').value;
+        let password = document.getElementById('passwordInput').value;
+
+        if (email === '' || password === '') {
+            alert('Please fill in both email and password fields.');
+            return; // Avbryt funktionen om något av fälten är tomt
+        }
+
+        fetch('http://localhost:3000/users/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: email, password: password })
+        })
+        .then(async (res) => {
+            const result = await res.json();
+            console.log(result);
+            if (!res.ok) {
+                throw new Error( result.message );
+            }
+
+            storeUser(result);
+    
             document.getElementById('emailInput').value = '';
             document.getElementById('passwordInput').value = '';
-
-            //dölja loginfälten
-            toggleHiddenClass();
-            //printa userns dokument i en lista
-            await printDocList();
+            
+            printDocList();
             createDocButton();
-
+            loginDiv.innerHTML = '';
+            loginDiv.classList.add('hidden');
+            printLogout();
         })
-});
+        .catch (err => {
+            console.error('error from catch', err);
+            alert(err);
+        });
+    })
 
-logoutButton.addEventListener('click', () => {
-    logoutUser();
-    loginDiv.classList.remove('hidden');
-    logoutDiv.classList.add('hidden');
-    documentList.innerHTML = '';
-    buttonHolder.innerHTML = '';
-});
-
-//Skapa knapp för new user
-function createNewUserButton() {
-    let button = document.createElement('button');
-    button.innerText = 'New user';
-    button.id = 'newUserButton';
-    button.addEventListener('click', () => {
+    let newUserButton = document.createElement('button');
+    newUserButton.innerText = 'New user';
+    newUserButton.id = 'newUserButton';
+    newUserButton.addEventListener('click', () => {
         console.log('klicketi-kuu');
         //Skapa ny användarformulär
         createNewUserForm();
+        loginDiv.innerHTML = '';
         loginDiv.classList.add('hidden');
-
+        
     })
-    loginDiv.appendChild(button);
+
+    // Lägg till elementen till loginDiv
+    loginDiv.appendChild(inputEmail);
+    loginDiv.appendChild(inputPassword);
+    loginDiv.appendChild(loginButton);
+    loginDiv.appendChild(newUserButton);
 }
+
+function printLogout() {
+    logoutDiv.classList.remove('hidden');
+    logoutDiv.innerHTML = '';
+    const user = getUser();
+    let nameP = document.createElement('p');
+    nameP.innerText = user.name;
+    let logoutButton = document.createElement('button');
+    logoutButton.id = 'logoutButton';
+    logoutButton.innerText = 'Logout';
+    logoutButton.addEventListener('click', () => {
+        logoutUser();
+        documentList.innerHTML = '';
+        buttonHolder.innerHTML = '';
+        documentContainer.innerHTML = '';
+        printLogin();
+        logoutDiv.innerHTML = '';
+    });
+    logoutDiv.appendChild(nameP);
+    logoutDiv.appendChild(logoutButton);
+}
+
 
 //Skapa ny användar-formulär
 function createNewUserForm() {
+    newUserDiv.classList.remove('hidden');
+    newUserDiv.innerHTML = '';
     let inputName = document.createElement('input');
     inputName.type = 'text';
     inputName.name = 'name';
@@ -114,24 +162,36 @@ function createNewUserForm() {
     inputPassword.id = "passwordInput";
     inputPassword.placeholder = "password";
 
-    let button = document.createElement('button');
-    button.innerText = 'Save';
-    button.addEventListener('click', () => {
-        console.log('kackelikack');
+    let backButton = document.createElement('button');
+    backButton.innerText = 'Back';
+    backButton.addEventListener('click', () => {
+
+        newUserDiv.innerHTML = '';
+        newUserDiv.classList.add('hidden');
+        printLogin();
+
+    });
+
+    let saveButton = document.createElement('button');
+    saveButton.innerText = 'Save and Login';
+    saveButton.addEventListener('click', () => {
+        
         const name = inputName.value;
         const email = inputEmail.value;
         const password = inputPassword.value;
         //spara new user från input till databasen
         saveNewUser(name, email, password);
-    })
+       
+    });
 
     newUserDiv.appendChild(inputName);
     newUserDiv.appendChild(inputEmail);
     newUserDiv.appendChild(inputPassword);
-    newUserDiv.appendChild(button);
+    newUserDiv.appendChild(saveButton);
+    newUserDiv.appendChild(backButton);
 }
 
-//skapa new user
+
 function saveNewUser(name, email, password) {
 
     fetch('http://localhost:3000/users/add', {
@@ -141,14 +201,20 @@ function saveNewUser(name, email, password) {
         },
         body: JSON.stringify({ name: name, email: email, password: password })
     })
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-            storeUser(data);
+        .then(async (res) => {
+            const result = await res.json();
+            if (!res.ok) {
+                throw new Error(result.message);
+            }
+            storeUser(result);
             newUserDiv.innerHTML = '';
-        })
-        .catch(error => {
-            console.error('error', error);
+            printLogout();
+            printDocList();
+            createDocButton();
+        }) 
+        .catch(err => {
+            console.error('error', err);
+            alert(err);
         });
 }
 
@@ -166,10 +232,10 @@ function createDocButton() {
 
 //Skapa nytt dokument
 function createNewDocument() {
-
+    documentContainer.classList.remove('hidden');
     const article = document.createElement('article');
     article.classList.add('edit_document');
-    article.id = 'editDocument';
+    article.id = 'createDocument';
 
     const input = document.createElement('input');
     input.id = 'documentHeading';
@@ -185,7 +251,7 @@ function createNewDocument() {
     textarea.placeholder = 'Enter document content';
 
     const button = document.createElement('button');
-    button.id = 'saveEditButton';
+    button.id = 'saveDocumentButton';
     button.innerText = 'Save';
     button.addEventListener('click', () => {
         console.log('On click save this to DB: ', input.value, textarea.value);
@@ -197,7 +263,7 @@ function createNewDocument() {
 
         // Uppdatera dokumentlistan för att reflektera det nya dokumentet
         printDocList();
-        const newDoc = { heading: heading, content: content };
+        const newDoc = { heading: heading, content: content, };
         printReadDoc(newDoc);
     });
 
@@ -237,7 +303,7 @@ function saveNewDocToDB(content, heading) {
 
 }
 
-
+//sprinta dok-listan
 async function printDocList() {
     try {
         const user = await getUser();
@@ -261,7 +327,7 @@ async function printDocList() {
                     printReadDoc(doc);
                 });
                 let button = document.createElement('button');
-                button.innerText = 'delete';
+                button.innerText = 'X';
                 button.addEventListener('click', () => {
                     console.log('du klickar på: ', doc.id);
                     //delete doc funktion (doc.id)?
@@ -295,9 +361,10 @@ function deleteDocument(docId) {
         });
 };
 
-
 //funktion för att visa i read-mode
 function printReadDoc(doc) {
+    tinymce.remove();
+    documentContainer.classList.remove('hidden');
 
     const article = document.createElement('article');
     article.classList.add('read_document_container');
@@ -332,6 +399,7 @@ function printReadDoc(doc) {
     closeButton.innerText = 'Close';
     closeButton.addEventListener('click', () => {
         documentContainer.innerHTML = '';
+        documentContainer.classList.add('hidden');
     })
 
 
@@ -374,7 +442,7 @@ function printEditDoc(doc) {
 
     const button = document.createElement('button');
     button.id = 'saveEditButton';
-    button.innerText = 'Save edit';
+    button.innerText = 'Save';
     button.addEventListener('click', () => {
         console.log('On click save this to DB: ', input.value, textarea.value);
         const editedContent = textarea.value;
@@ -388,10 +456,21 @@ function printEditDoc(doc) {
         const editedDoc = { id: docId, heading: editedHeading, content: editedContent };
         printReadDoc(editedDoc);
     });
+    const buttonBack = document.createElement('button');
+    buttonBack.id = 'backEditButton';
+    buttonBack.innerText = 'Back';
+    buttonBack.addEventListener('click', () => {
+        tinymce.remove();
+        printDocList();
+        documentContainer.innerHTML = '';
+        printReadDoc(doc);
+        
+    });
 
     article.appendChild(input);
     article.appendChild(textarea);
     article.appendChild(button);
+    article.appendChild(buttonBack);
 
     documentContainer.innerHTML = '';
     documentContainer.appendChild(article);
