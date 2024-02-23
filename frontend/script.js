@@ -59,14 +59,13 @@ function printLogin() {
     loginButton.id = 'loginButton';
     loginButton.innerText = 'Login';
     loginButton.addEventListener('click', () => {
-        console.log('clicketiclick');
 
         let email = document.getElementById('emailInput').value;
         let password = document.getElementById('passwordInput').value;
 
         if (email === '' || password === '') {
             alert('Please fill in both email and password fields.');
-            return; // Avbryt funktionen om något av fälten är tomt
+            return;
         }
 
         fetch('http://localhost:3000/users/login', {
@@ -104,15 +103,13 @@ function printLogin() {
     newUserButton.innerText = 'New user';
     newUserButton.id = 'newUserButton';
     newUserButton.addEventListener('click', () => {
-        console.log('klicketi-kuu');
-        //Skapa ny användarformulär
+    
         createNewUserForm();
         loginDiv.innerHTML = '';
         loginDiv.classList.add('hidden');
         
     })
 
-    // Lägg till elementen till loginDiv
     loginDiv.appendChild(inputEmail);
     loginDiv.appendChild(inputPassword);
     loginDiv.appendChild(loginButton);
@@ -139,7 +136,6 @@ function printLogout() {
     logoutDiv.appendChild(nameP);
     logoutDiv.appendChild(logoutButton);
 }
-
 
 //Skapa ny användar-formulär
 function createNewUserForm() {
@@ -179,7 +175,6 @@ function createNewUserForm() {
         const name = inputName.value;
         const email = inputEmail.value;
         const password = inputPassword.value;
-        //spara new user från input till databasen
         saveNewUser(name, email, password);
        
     });
@@ -190,7 +185,6 @@ function createNewUserForm() {
     newUserDiv.appendChild(saveButton);
     newUserDiv.appendChild(backButton);
 }
-
 
 function saveNewUser(name, email, password) {
 
@@ -258,7 +252,6 @@ function createNewDocument() {
         const content = textarea.value;
         const heading = input.value;
 
-        // Skicka det nya dokumentet till servern för lagring
         saveNewDocToDB(content, heading);
 
         // Uppdatera dokumentlistan för att reflektera det nya dokumentet
@@ -274,7 +267,6 @@ function createNewDocument() {
     documentContainer.innerHTML = '';
     documentContainer.appendChild(article);
     initTinymce();
-
 };
 
 function saveNewDocToDB(content, heading) {
@@ -288,22 +280,20 @@ function saveNewDocToDB(content, heading) {
         body: JSON.stringify({ id: userId, heading: heading, content: content })
 
     })
-        .then(response => {
-            return response.json();
-        })
-        .then(data => {
-            console.log('Edit saved successfully: ', data);
-            tinymce.remove();
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        console.log('Edit saved successfully: ', data);
+        tinymce.remove();
 
-        })
-        .catch(error => {
-            console.error('Error saving edit:', error);
-        });
-
-
+    })
+    .catch(error => {
+        console.error('Error saving edit:', error);
+    });
 }
 
-//sprinta dok-listan
+//printa dok-listan
 async function printDocList() {
     try {
         const user = await getUser();
@@ -346,7 +336,7 @@ async function printDocList() {
     }
 }
 
-//funktion för att delete dokument
+//delete dokument
 function deleteDocument(docId) {
     fetch(`http://localhost:3000/documents/${docId}`, {
         method: 'DELETE',
@@ -390,7 +380,6 @@ function printReadDoc(doc) {
     editButton.id = 'editButton';
     editButton.innerText = 'Edit';
     editButton.addEventListener('click', () => {
-        console.log('clicketiclack');
         printEditDoc(doc);
     })
 
@@ -402,8 +391,6 @@ function printReadDoc(doc) {
         documentContainer.classList.add('hidden');
     })
 
-
-    // Lägg till de skapade elementen i article-elementet
     article.appendChild(heading);
     article.appendChild(created);
     article.appendChild(lastEdited);
@@ -416,7 +403,6 @@ function printReadDoc(doc) {
 }
 
 //funktion för att visa i edit-mode
-
 function printEditDoc(doc) {
 
     const article = document.createElement('article');
@@ -449,7 +435,6 @@ function printEditDoc(doc) {
         const editedHeading = input.value;
         const docId = doc.id;
 
-        //uppdatera heading i db och content och lastEdited
         saveEditToDB(editedContent, editedHeading, docId);
         printDocList();
 
@@ -478,7 +463,6 @@ function printEditDoc(doc) {
 }
 
 //spara editerat dokument i databas
-
 function saveEditToDB(editedContent, editedHeading, docId) {
     fetch('http://localhost:3000/documents', {
         method: 'PUT',
@@ -500,7 +484,5 @@ function saveEditToDB(editedContent, editedHeading, docId) {
 
     tinymce.remove();
 }
-//Skapa nytt dokument, 2 fields ett för heading ett för content
-//spara dokument i databas
 
 init();
