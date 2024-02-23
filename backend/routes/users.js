@@ -42,6 +42,7 @@ router.post('/add', (req, res) => {
 
 
 
+//User loggas in ändå! Fast mail och eller lösen är fel? Då skickar den tillbaka key user och message och lägger i localstorage
 
 // Login user check email/password-match
 router.post('/login', (req, res) => {
@@ -54,7 +55,7 @@ router.post('/login', (req, res) => {
         connection.query(query, [email], function (err, result) {
             if (err) {
                 console.log('error with query', err);
-                res.status(500).json({ error: 'internal server error' });
+                res.status(500).json({ message: 'internal server error' });
                 return;
             }
             if (result.length === 0) {
@@ -64,7 +65,7 @@ router.post('/login', (req, res) => {
 
             const user = result[0];
             if (password === user.password) {
-                res.json({ message: 'Login successful', id: user.id, email: user.email, name: user.name });
+                res.json({id: user.id, email: user.email, name: user.name });
                 return;
             } else {
                 res.status(401).json({ message: 'Incorrect password' });
