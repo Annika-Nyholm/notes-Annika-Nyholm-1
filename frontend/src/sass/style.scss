@@ -1,0 +1,143 @@
+@import 'variables';
+@import 'mixins';
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: $secondary-background;
+    display: flex;
+	header {
+        background-color: $primary-background;
+		width: 400px;
+		height: 100vh;
+        display: flex;
+        align-items: center;
+        padding: 10px 20px;
+        flex-direction: column;
+        border-right: 1px solid rgb(72, 95, 95);
+        .logout {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-items: space-between;
+            button {
+                @include buttons;
+                width: fit-content;
+                height: fit-content;
+            }
+        }
+		h1 {
+			font-family: 'Protest Revolution', sans-serif;
+			font-size: 4rem;
+			@include textshadow2;
+            margin: 0;
+            padding-bottom: 100px;
+            padding-top: 50px;
+		}
+        .button_holder {
+            button {
+                @include buttons;
+            }
+        }
+        ul {
+            list-style-type: none;
+            cursor: pointer;
+            display: grid;
+            grid-template-columns: 3fr;
+            gap: 10px;
+            button {
+                grid-column: 1;
+                background-color: $button-color;
+                color: white;
+                cursor: pointer;
+                padding: 4px;
+                border-radius: 4px;
+                width: fit-content;
+            }
+            li {
+                grid-column: 2;
+                font-size: 1.25rem;
+            }
+        }
+	}
+	main {
+		display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+		//align-content: center;
+		//justify-content: center;
+
+		.login {
+            @include boxshadow;
+            border-radius: 8px;
+            background-color: $primary-background;
+            padding: 50px;
+			display: flex;
+			flex-direction: column;
+            justify-content: center;
+            align-items: center;
+			gap: 10px;
+            input {
+                padding: 8px;
+                border-radius: 4px;
+            }
+			button {
+				@include buttons;
+			}
+        }
+        .new_user {
+            @include boxshadow;
+            border-radius: 8px;
+            background-color: $primary-background;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            input {
+                padding: 8px;
+                border-radius: 4px;
+            }
+            button {
+                @include buttons;
+            }
+        }
+
+        .documents_container {
+            display: flex;
+            gap: 10px;
+            p {
+                margin: 0;
+                padding: 4px;
+            }
+            .read_document {
+                background-color: white;
+                width: 450px;
+                height: 500px;
+                padding: 16px;
+                @include boxshadow;
+            }
+            button {
+                @include buttons;
+                margin-top: 12px;
+                margin-right: 4px;
+            }
+            .edit_document {
+                background-color: white;
+                @include boxshadow;
+                padding: 16px;
+
+            }
+        }
+	}
+}
+
+
+.hidden {
+	display: none !important;
+}
