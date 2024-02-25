@@ -1,6 +1,4 @@
-Simple create, edit and read documents.
 
-Inlämningsuppgift
 Inlämningsuppgift: Notes
 
 Vi bygger ett dokumenthanteringssystem med en relationsdatabas!
@@ -41,7 +39,7 @@ Samt dokumentera användarnamn och lösenord för databasen.
 
 # Simple document system with a relations database
 
-An assignment for school. An application to create, read, and edit documents and store them to a SQL databse. I chose to edit with tinyMCE.
+An assignment for school. An application to create, read, and edit documents and store them to a SQL database. I chose to edit with tinyMCE.
 
 
 
