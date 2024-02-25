@@ -39,7 +39,7 @@ Samt dokumentera användarnamn och lösenord för databasen.
 
 
 
-# Simple document system with a relationsdatabase
+# Simple document system with a relations database
 
 An assignment for school. An application to create, read, and edit documents and store them to a SQL databse. I chose to edit with tinyMCE.
 
@@ -48,7 +48,9 @@ An assignment for school. An application to create, read, and edit documents and
 ## Screenshots
 
 ![QuickNotes Login](frontend/src/assets/screenshots/QuickNotes_login.jpg)
+
 ![QuickNotes readDoc](frontend/src/assets/screenshots/QuickNotes_readDoc.jpg)
+
 ![QuickNotes editDoc](frontend/src/assets/screenshots/QuickNotes_editDoc.jpg)
 
 
@@ -69,9 +71,65 @@ The project is built using the following:
  
 
 ### WYSIWYG
+
 TinyMCE
 
+
 ## SQL Relations
+
+![alt text](backend/database/QuickNotesEER.JPG)
+
+
+## mySQL passwords
+
+    user: process.env.MYSQL_USER,
+    password: process.env.MYSQL_PASS,
+    database: 'quick_notes'
+
+    MYSQL_PASS="Test@r1234!"
+    MYSQL_USER="newuser"
+
+## Run Locally
+
+Clone the project
+
+```bash
+  git clone https://github.com/plugga-tech/notes-Annika-Nyholm-1
+```
+
+Go to the project directory
+
+```bash
+  cd backend/
+```
+
+Install dependencies
+
+```bash
+  npm install 
+  npx express-generator --no-view
+  npm install cors mysql2 dotenv
+```
+
+Start the server
+
+```bash
+  nodemon start
+```
+
+Frontend
+
+```bash
+  cd frontend/
+```
+Install dependencies
+
+```bash
+  npm install 
+  npm install -g sass
+  npm install normalize tinymce
+```
+Open with live server
 
 
 
