@@ -3,12 +3,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
-const connection = require('./lib/conn.js');
-require('dotenv').config();
-const mysql = require('mysql2');
 
-
-const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const documentsRouter = require('./routes/documents');
 
@@ -18,10 +13,9 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-//app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
-app.use('/', indexRouter);
+//routes
 app.use('/users', usersRouter);
 app.use('/documents', documentsRouter);
 
