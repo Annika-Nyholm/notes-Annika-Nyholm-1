@@ -19,16 +19,11 @@ router.get('/', function (req, res) {
             res.status(500).json({ message: 'Internal server error' });
             return;
         }
-        //här ska vi hitta att checka och skicka mess om table är tomt för usern
-        // if (data.length === 0) {
-        //     res.status(204).json({ message: 'No content found' });
-        // } else {
-        // }
         res.json({ documents: data });
     });
 });
 
-//hämta ett specifikt dokument
+//Get one specific document
 router.get('/:id', (req, res) => {
     const docId = req.params.id;
 
@@ -54,14 +49,8 @@ router.post('/add', (req, res) => {
         return;
     }
 
-    let documentContent = {
-        userId: id, //ska egentligen hämtas inloggat id från localstorage
-        heading: heading,
-        content: content
-    }
-
     let query = 'INSERT INTO documents (userId, heading, content) VALUES (?, ?, ?)';
-    let values = [documentContent.userId, documentContent.heading, documentContent.content];
+    let values = [id, heading, content];
 
     connection.query(query, values, (err, data) => {
         if (err) {
@@ -69,36 +58,53 @@ router.post('/add', (req, res) => {
             res.status(500).json({ message: 'Internal server error', error: err });
             return;
         }
-        res.json({ message: 'Created new document successfully', newDocument: data });
+        const docId = data.insertId;
+        let query = 'SELECT * FROM documents WHERE id = ?';
+        let value = [docId];
+        connection.query(query, value, (err, document) => {
+            if (err) {
+                console.error('Error fetching document', err);
+                res.status(500).json({ message: 'Internal server error' });
+                return;
+            }
+            res.json({ message: 'Created new document successfully', newDocument: document });
+        });
+
     });
 });
 
-//Edit ett dokument för en user
-
+//Edit document for a user
 router.put('/', (req, res) => {
     let { id, heading, content } = req.body;
 
     let query = 'UPDATE documents SET heading=?, content=?, lastEdited=current_timestamp WHERE id=?';
     let values = [heading, content, id]
-    connection.query(query, values, (err, data) => {
+    connection.query(query, values, (err) => {
         if (err) {
             console.error('Error editing document', err);
             res.status(500).json({ message: 'Internal server error', error: err });
             return;
         }
-        res.json({ message: 'Edit complete', editedDoc: id });
-
+        query = 'SELECT * FROM documents WHERE id = ?';
+        connection.query(query, [id], (err, document) => {
+            if (err) {
+                console.error('Error fetching document', err);
+                res.status(500).json({ message: 'Internal server error' });
+                return;
+            }
+            res.json({ message: 'Created new document successfully', document: document });
+            return;
+        });        
     });
 });
 
-//Delete ett dokument
-
+//Delete a document
 router.delete('/:id', (req, res) => {
     const docId = req.params.id;
 
     let query = 'UPDATE documents SET softDelete=1 WHERE id=?';
 
-    connection.query(query, [docId], (err, data) => {
+    connection.query(query, [docId], (err) => {
         if (err) {
             console.error('Error deleting document', err);
             res.status(500).json({ message: 'Internal server error', error: err });

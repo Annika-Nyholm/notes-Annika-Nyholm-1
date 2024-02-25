@@ -2,13 +2,6 @@ const express = require('express');
 const router = express.Router();
 const connection = require('../lib/conn');
 
-
-/* GET users listing. */
-router.get('/', (req, res) => {
-    res.send('Here will users lie around and wait for something better to do');
-});
-
-
 // Create new user
 router.post('/add', (req, res) => {
     const {name, email, password} = req.body;
@@ -18,41 +11,53 @@ router.post('/add', (req, res) => {
         return;
     }
 
-    let user = {
-        name: name,
-        email: email,
-        password: password
-    }
-
-    let query = 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)';
-    let values = [user.name, user.email, user.password];
-
-    connection.query(query, values, (err, data) => {
-        if (err) {
-            console.log('error with query', err);
+    let queryCheckExists = 'SELECT * FROM users WHERE email = ?';
+    connection.query(queryCheckExists, [email], (existErr, existResult) => {
+        if (existErr) {
+            console.log('error with query', existErr);
             res.status(500).json({ error: 'internal server error' });
             return;
         }
 
-        res.json({message: 'New user created', newUser: data});
+        if (existResult.length !== 0) {
+            res.status(400).json({ message: 'User already exists' });
+            return;
+        }
+    
+        let query = 'INSERT INTO users (name, email, password) VALUES (?, ?, ?)';
+        let values = [name, email, password];
+    
+        connection.query(query, values, (err, data) => {
+            if (err) {
+                console.log('error with query', err);
+                res.status(500).json({ error: 'internal server error' });
+                return;
+            }
+            let newUserData = {
+                id: data.insertId,
+                name: name,
+                email: email
+            }
+            res.json({message: 'New user created', newUser: newUserData});
+            return;
+        });
+    
     });
-
 });
 
 
-
-
-//User loggas in ändå! Fast mail och eller lösen är fel? Då skickar den tillbaka key user och message och lägger i localstorage
-
-// Login user check email/password-match
+// Login user
 router.post('/login', (req, res) => {
     const { email, password } = req.body;
-
-    let query = 'SELECT * FROM users WHERE email = ?';
-
-
     if (email) {
-        connection.query(query, [email], function (err, result) {
+        //validate email
+        if(!email.includes('@')) {
+            res.status(400).json({message: 'Invalid email address'});
+            return; 
+        }
+
+        let query = 'SELECT * FROM users WHERE email = ?';
+        connection.query(query, [email], (err, result) => {
             if (err) {
                 console.log('error with query', err);
                 res.status(500).json({ message: 'internal server error' });

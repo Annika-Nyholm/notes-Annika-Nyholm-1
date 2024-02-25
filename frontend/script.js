@@ -30,14 +30,18 @@ function init() {
     printLogin();
     //Is user logged in?
     if (getUser() !== null) {
-        printDocList();
-        createDocButton();
-        printLogout();
-        loginDiv.innerHTML = '';
-        loginDiv.classList.add('hidden');
+        showLoginState();
     }
 }
 
+function showLoginState() {
+    printDocList();
+    createDocButton();
+    printLogout();
+    loginDiv.innerHTML = '';
+    loginDiv.classList.add('hidden');
+    newUserDiv.classList.add('hidden');
+}
 
 function printLogin() {
     loginDiv.innerHTML = '';
@@ -63,7 +67,7 @@ function printLogin() {
         let email = document.getElementById('emailInput').value;
         let password = document.getElementById('passwordInput').value;
 
-        if (email === '' || password === '') {
+        if (email.trim() === '' || password.trim() === '') {
             alert('Please fill in both email and password fields.');
             return;
         }
@@ -87,11 +91,7 @@ function printLogin() {
             document.getElementById('emailInput').value = '';
             document.getElementById('passwordInput').value = '';
             
-            printDocList();
-            createDocButton();
-            loginDiv.innerHTML = '';
-            loginDiv.classList.add('hidden');
-            printLogout();
+            showLoginState();
         })
         .catch (err => {
             console.error('error from catch', err);
@@ -137,7 +137,6 @@ function printLogout() {
     logoutDiv.appendChild(logoutButton);
 }
 
-//Skapa ny användar-formulär
 function createNewUserForm() {
     newUserDiv.classList.remove('hidden');
     newUserDiv.innerHTML = '';
@@ -195,21 +194,19 @@ function saveNewUser(name, email, password) {
         },
         body: JSON.stringify({ name: name, email: email, password: password })
     })
-        .then(async (res) => {
-            const result = await res.json();
-            if (!res.ok) {
-                throw new Error(result.message);
-            }
-            storeUser(result);
-            newUserDiv.innerHTML = '';
-            printLogout();
-            printDocList();
-            createDocButton();
-        }) 
-        .catch(err => {
-            console.error('error', err);
-            alert(err);
-        });
+    .then(async (res) => {
+        const result = await res.json();
+        if (!res.ok) {
+            throw new Error(result.message);
+        }
+        console.log("create user ", result);
+        storeUser(result.newUser);
+        showLoginState();
+    }) 
+    .catch(err => {
+        console.error('error', err);
+        alert(err);
+    });
 }
 
 //skapa knapp för skapa dokument
@@ -218,9 +215,8 @@ function createDocButton() {
     button.innerText = 'Create document';
     button.id = 'createDocument';
     button.addEventListener('click', () => {
-        console.log('kliiiiiick');
         createNewDocument();
-    })
+    });
     buttonHolder.appendChild(button);
 }
 
@@ -248,16 +244,10 @@ function createNewDocument() {
     button.id = 'saveDocumentButton';
     button.innerText = 'Save';
     button.addEventListener('click', () => {
-        console.log('On click save this to DB: ', input.value, textarea.value);
         const content = textarea.value;
         const heading = input.value;
 
         saveNewDocToDB(content, heading);
-
-        // Uppdatera dokumentlistan för att reflektera det nya dokumentet
-        printDocList();
-        const newDoc = { heading: heading, content: content, };
-        printReadDoc(newDoc);
     });
 
     article.appendChild(input);
@@ -280,29 +270,26 @@ function saveNewDocToDB(content, heading) {
         body: JSON.stringify({ id: userId, heading: heading, content: content })
 
     })
-    .then(response => {
-        return response.json();
-    })
-    .then(data => {
-        console.log('Edit saved successfully: ', data);
-        tinymce.remove();
-
+    .then(async(response) => {
+        let data = await response.json();
+        if (!response.ok)
+            throw new Error(data.message);
+        // Uppdatera dokumentlistan för att reflektera det nya dokumentet
+        printReadDoc(data.newDocument[0]);
+        printDocList();
     })
     .catch(error => {
-        console.error('Error saving edit:', error);
+        console.error('Error saving new doc', error.message);
     });
 }
 
-//printa dok-listan
 async function printDocList() {
     try {
-        const user = await getUser();
+        const user = getUser();
         const response = await fetch(`http://localhost:3000/documents/?userId=${user.id}`)
         const data = await response.json();
-        console.log('detta är datan: ', data.documents);
 
         documentList.innerHTML = '';
-
         if (data.documents.length === 0) {
             documentList.innerHTML = '<li>No documents available</li>';
         } else {
@@ -311,16 +298,11 @@ async function printDocList() {
                 li.innerText = doc.heading;
 
                 li.addEventListener('click', () => {
-
-                    console.log('du klickar på: ', doc.id);
-                    //funktion för att öppna doc i läsläge
                     printReadDoc(doc);
                 });
                 let button = document.createElement('button');
                 button.innerText = 'X';
                 button.addEventListener('click', () => {
-                    console.log('du klickar på: ', doc.id);
-                    //delete doc funktion (doc.id)?
                     deleteDocument(doc.id);
                     printDocList();
                 });
@@ -332,26 +314,23 @@ async function printDocList() {
 
     } catch (error) {
         console.error('Error fetching list', error);
-        documentList.innerHTML = '<li>No documents available</li>';
+        documentList.innerHTML = '<li>Error fetching documents</li>';
     }
 }
 
-//delete dokument
 function deleteDocument(docId) {
     fetch(`http://localhost:3000/documents/${docId}`, {
         method: 'DELETE',
     })
-        .then(res => res.json())
-        .then(data => {
-            console.log('raderad', data);
-
-        })
-        .catch(error => {
-            console.error('Error deleting document', error);
-        });
+    .then(res => res.json())
+    .then(data => {
+        console.log('Document deleted.');
+    })
+    .catch(error => {
+        console.error('Error deleting document', error);
+    });
 };
 
-//funktion för att visa i read-mode
 function printReadDoc(doc) {
     tinymce.remove();
     documentContainer.classList.remove('hidden');
@@ -364,11 +343,13 @@ function printReadDoc(doc) {
     heading.id = 'readDocumentHeading';
 
     const created = document.createElement('p');
-    created.innerText = `Created: ${doc.created}`;
+    let createdDate = new Date(doc.created);
+    created.innerText = `Created: ${createdDate.toLocaleString()}`;
     created.id = 'readCreated';
 
     const lastEdited = document.createElement('p');
-    lastEdited.innerText = `Last edited: ${doc.lastEdited}`;
+    let editedDate = new Date(doc.lastEdited);
+    lastEdited.innerText = `Last edited: ${editedDate.toLocaleString()}`;
     lastEdited.id = 'readLastEdited';
 
     const content = document.createElement('div');
@@ -402,7 +383,6 @@ function printReadDoc(doc) {
     documentContainer.appendChild(article);
 }
 
-//funktion för att visa i edit-mode
 function printEditDoc(doc) {
 
     const article = document.createElement('article');
@@ -415,9 +395,6 @@ function printEditDoc(doc) {
     input.type = 'text';
     input.placeholder = 'Document title';
     input.value = doc.heading;
-    input.addEventListener('input', () => {
-        console.log('Document title: ', input.value);
-    });
 
     const textarea = document.createElement('textarea');
     textarea.id = 'editArea';
@@ -464,6 +441,7 @@ function printEditDoc(doc) {
 
 //spara editerat dokument i databas
 function saveEditToDB(editedContent, editedHeading, docId) {
+    tinymce.remove();
     fetch('http://localhost:3000/documents', {
         method: 'PUT',
         headers: {
@@ -471,18 +449,17 @@ function saveEditToDB(editedContent, editedHeading, docId) {
         },
         body: JSON.stringify({ content: editedContent, heading: editedHeading, id: docId })
     })
-        .then(response => {
-            return response.json();
-        })
-        .then(data => {
-            console.log('Edit saved successfully: ', data);
-
-        })
-        .catch(error => {
-            console.error('Error saving edit:', error);
-        });
-
-    tinymce.remove();
+    .then(async(response) => {
+        let data = await response.json();
+        if (!response.ok)
+            throw new Error(data.message);
+        // Uppdatera dokumentlistan för att reflektera det nya dokumentet
+        printReadDoc(data.document[0]);
+        printDocList();
+    })
+    .catch(error => {
+        console.error('Error saving edit doc', error.message);
+    });
 }
 
 init();
