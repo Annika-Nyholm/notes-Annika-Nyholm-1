@@ -111,6 +111,11 @@ Install dependencies
   npm install cors mysql2 dotenv
 ```
 
+Run database scripts
+backend/databse
+users.sql
+documents.sql
+
 Start the server
 
 ```bash
