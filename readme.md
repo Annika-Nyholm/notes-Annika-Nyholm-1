@@ -1,38 +1,39 @@
+# Project Overview: Notes Document Management System
 
-Inlämningsuppgift: Notes
+This project is a document management system built as a demo for a client who wants to create and manage digital documents. The system consists of a frontend and a backend (headless architecture), where users can log in, create, view, edit, and delete documents. The application uses a MySQL database to store documents and user data, and implements full CRUD functionality (Create, Read, Update, Delete).
 
-Vi bygger ett dokumenthanteringssystem med en relationsdatabas!
+## Features:
+- **User Authentication**: Users can log in and access their documents.
+- **Document Management**: Users can create new documents, edit existing ones, and delete them.
+- **Editable and View-Only Modes**: Each document can be viewed in both a live mode (without editing) and in an editable mode.
+- **WYSIWYG Editor**: A WYSIWYG (What You See Is What You Get) editor allows users to format text, change text color, and adjust the background color of the document.
+- **Multi-user Functionality** (VG requirement): Users can create their own accounts and manage their own documents. Users can only view and manage their own documents.
 
-Bakgrund
+## Technical Details:
+- The backend is implemented with Node.js and uses MySQL for the database.
+- The frontend is built with a modern JavaScript framework (e.g., Vue.js or React).
+- Communication between frontend and backend is handled via a REST API, enabling a clear separation of concerns.
+- All user data and documents are stored securely in the MySQL database.
 
-Du har fått en kund som vill bygga ett eget system för att skapa digitala dokument och önskar att se en demo på detta.
-Kunden vill kunna logga in på sitt system, där se en lista på alla skapade dokument, kunna skapa nya och redigera de som redan finns där. Samt ta bort ett dokument. När kunden tittar på ett skapat dokument så skall det finnas möjlighet att se dokumentet både “live” dvs utan redigeringsläget samt att se dokumentet i redigeringsläge.
+## How to Start the Project:
+1. **Backend**: 
+   - Navigate to the `/backend` directory.
+   - Install dependencies using `npm install`.
+   - Configure the database connection in the `.env` file.
+   - Start the server with `npm start`.
+   
+2. **Frontend**:
+   - Navigate to the `/frontend` directory.
+   - Install dependencies using `npm install`.
+   - Start the development server with `npm run dev`.
 
-G krav
+Make sure to use the provided database dump to initialize the database with sample data for testing.
 
-Det skall finnas en inloggning, men nivån på säkerhet för prototyp bestämmer du själv (dokumentera hur du har valt att göra). 
-Dokument skall skapas och sparas i en MySql databas.
-Projektet skall utformas som en headless applikation, dvs med ett frontend projekt och ett API.
-För dokument skall det finnas en enkel redigering, där det går att skriva och ändra text. 
-Ett dokument skall kunna visas i både redigerings och “vanligt” läge.
-Förutom dessa tekniska krav är resten utav arkitekturen upp till dig. 
-Alla CRUD operationer skall användas. Create, Read, Update, Delete.
+## Database:
+The project includes a MySQL database that stores user information and document data. Users can only access documents they have created. A database schema diagram is included in the documentation to explain the relationships between the tables.
 
-VG Krav
-
-Det skall gå att skapa nya användare som kan skapa sina egna dokument. Och enbart se sina skapade dokument.
-Det skall finnas en WYSIWYG editorn där det går att ändra både textfärg och bakgrundsfärg i editorn, samt att det skall gå att spara. 
-Du skall även bifoga ett enklare dokument som visar hur databasen och dess relationer är konstruerat. 
-
-
-Inlämning
-
-Projektet skall genomföras enligt headless principen men skapa strukturen för projektet i ett repo. Dvs i rooten kommer du ha en mapp som heter tex “frontend” och en mapp som heter “backend”. Dokumentera i readme.md hur projektet startas och är uppbyggt.
-
-Skicka in länken till ert repo.
-
-Bifoga även en databasdump (export) med lite innehåll så att projektet går att testa.
-Samt dokumentera användarnamn och lösenord för databasen.
+## Credentials:
+For testing purposes, the database username and password are documented in the project. Be sure to configure your environment settings before running the project.
 
 
 
