@@ -11,7 +11,7 @@ This project is a document management system built as a demo for a client who wa
 
 ## Technical Details:
 - The backend is implemented with Node.js and uses MySQL for the database.
-- The frontend is built with a modern JavaScript framework (e.g., Vue.js or React).
+- The frontend is built with a modern JavaScript framework e.g. Vue.js.
 - Communication between frontend and backend is handled via a REST API, enabling a clear separation of concerns.
 - All user data and documents are stored securely in the MySQL database.
 
@@ -34,14 +34,6 @@ The project includes a MySQL database that stores user information and document 
 
 ## Credentials:
 For testing purposes, the database username and password are documented in the project. Be sure to configure your environment settings before running the project.
-
-
-
-
-# Simple document system with a relations database
-
-An assignment for school. An application to create, read, and edit documents and store them to a SQL database. I chose to edit with tinyMCE.
-
 
 
 ## Screenshots
