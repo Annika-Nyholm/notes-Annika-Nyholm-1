@@ -78,15 +78,6 @@ TinyMCE
 ![alt text](backend/database/QuickNotesEER.JPG)
 
 
-## mySQL passwords
-
-    user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASS,
-    database: 'quick_notes'
-
-    MYSQL_PASS="Test@r1234!"
-    MYSQL_USER="newuser"
-
 ## Run Locally
 
 Clone the project
